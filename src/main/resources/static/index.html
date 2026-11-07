@@ -1,0 +1,801 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Parking Finder</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f7ff;
+    color: #172554;
+}
+
+nav {
+    background: #102b64;
+    color: white;
+    padding: 22px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav h2 {
+    font-size: 23px;
+}
+
+nav span {
+    color: #8fc4ff;
+}
+
+.hero {
+    text-align: center;
+    padding: 65px 20px 45px;
+    background: linear-gradient(120deg, #123779, #536ee8);
+    color: white;
+}
+
+.hero h1 {
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    font-size: 16px;
+    margin-bottom: 28px;
+}
+
+.search {
+    background: white;
+    max-width: 650px;
+    margin: auto;
+    padding: 9px;
+    border-radius: 12px;
+    display: flex;
+    gap: 10px;
+}
+
+.search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    padding: 14px;
+    font-size: 16px;
+}
+
+button {
+    border: 0;
+    border-radius: 9px;
+    background: #ff9f35;
+    color: white;
+    padding: 14px 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.locations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 38px;
+}
+
+.locations button {
+    background: white;
+    color: #23447e;
+    border: 1px solid #dce5f5;
+    padding: 12px 17px;
+}
+
+.locations button:hover {
+    background: #e3edff;
+}
+
+.results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 15px;
+    box-shadow: 0 4px 18px #1b397514;
+}
+
+.card h3 {
+    margin-bottom: 12px;
+}
+
+.card p {
+    margin: 10px 0;
+    color: #64748b;
+}
+
+.available {
+    color: #13864d;
+    font-weight: bold;
+}
+
+.unavailable {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.card button {
+    width: 100%;
+    margin-top: 12px;
+    background: #315de2;
+}
+
+.booking-form {
+    margin-top: 18px;
+    padding: 16px;
+    background: #f1f5ff;
+    border-radius: 12px;
+}
+
+.booking-form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.booking-form input,
+.booking-form select {
+    width: 100%;
+    padding: 11px;
+    margin-top: 6px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 15px;
+    background: white;
+}
+
+.booking-form .fee {
+    font-weight: bold;
+    color: #13864d;
+    margin-top: 15px;
+}
+
+.booking-form button {
+    margin-top: 12px;
+}
+
+.confirmation {
+    margin-top: 15px;
+    padding: 14px;
+    background: #dcfce7;
+    color: #166534;
+    border-radius: 9px;
+    line-height: 1.7;
+}
+
+.message {
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    color: #64748b;
+}
+
+.history-status {
+    font-weight: bold;
+    color: #13864d !important;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+}
+
+@media(max-width: 550px) {
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .search {
+        flex-direction: column;
+    }
+
+    .search button {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <h2>🅿 Smart<span>Park</span></h2>
+    <strong>Hyderabad</strong>
+</nav>
+
+<section class="hero">
+    <h1>Find Your Perfect Parking Spot</h1>
+    <p>Search your destination and discover parking facilities.</p>
+
+    <div class="search">
+        <input id="location"
+            placeholder="Enter location e.g. Charminar, HITEC City">
+
+        <button onclick="searchParking()">
+            Find Parking
+        </button>
+    </div>
+</section>
+
+<main class="container">
+
+    <h2>📍 Popular Destinations</h2>
+
+    <div class="locations" id="locations"></div>
+
+    <h2 id="resultTitle">Explore Parking Facilities</h2>
+
+    <div class="results" id="results">
+        <div class="card">
+            <h3>Welcome to SmartPark!</h3>
+            <p>Search a Hyderabad destination to explore parking options.</p>
+        </div>
+    </div>
+
+</main>
+
+<section class="container">
+
+    <h2>📋 Booking History</h2>
+
+    <div id="historyResults" class="results">
+        <div class="message">
+            Loading booking history...
+        </div>
+    </div>
+
+</section>
+
+<footer>
+    Smart Parking Slot Finder | Hyderabad
+</footer>
+
+<script>
+
+// POPULAR DESTINATIONS
+
+const places = [
+    "Charminar", "HITEC City", "Gachibowli", "Ameerpet",
+    "Secunderabad", "Jubilee Hills", "Banjara Hills", "Madhapur",
+    "Tank Bund", "Necklace Road", "Golconda Fort", "Kondapur",
+    "Begumpet", "Koti", "Abids", "Shamshabad", "LB Nagar",
+    "Dilsukhnagar", "Uppal", "Kompally", "Tarnaka",
+    "Mehdipatnam", "Nampally", "Airport", "Ramoji Film City"
+];
+
+const locationBox = document.getElementById("location");
+const results = document.getElementById("results");
+
+// DISPLAY DESTINATION BUTTONS
+
+places.forEach(place => {
+
+    const btn = document.createElement("button");
+
+    btn.textContent = place;
+
+    btn.onclick = () => {
+        locationBox.value = place;
+        searchParking();
+    };
+
+    document.getElementById("locations").appendChild(btn);
+
+});
+
+
+// SEARCH PARKING FACILITIES
+
+async function searchParking() {
+
+    const place = locationBox.value.trim();
+
+    if (!place) {
+        alert("Please enter a location!");
+        return;
+    }
+
+    document.getElementById("resultTitle").textContent =
+        "Parking near " + place;
+
+    results.innerHTML =
+        '<div class="message">Searching parking facilities...</div>';
+
+    try {
+
+        const response = await fetch(
+            "/api/parking/search?q=" + encodeURIComponent(place)
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to fetch parking details");
+        }
+
+        const data = await response.json();
+
+        if (data.length === 0) {
+
+            results.innerHTML = `
+                <div class="message">
+                    <h3>No registered parking facilities found.</h3>
+                    <p>Try one of the listed Hyderabad destinations.</p>
+                </div>
+            `;
+
+            return;
+        }
+
+        results.innerHTML = "";
+
+        data.forEach(parking => {
+
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const heading = document.createElement("h3");
+            heading.textContent = "🅿 " + parking.facility_name;
+
+            const area = document.createElement("p");
+            area.textContent = "📍 " + parking.area;
+
+            const address = document.createElement("p");
+            address.textContent = parking.address || "Hyderabad";
+
+            const total = document.createElement("p");
+            total.textContent = "Total Slots: " + parking.total_slots;
+
+            const available = document.createElement("p");
+
+            available.className =
+                Number(parking.available_slots) > 0
+                ? "available"
+                : "unavailable";
+
+            available.textContent =
+                "Available Slots: " + parking.available_slots;
+
+            const rate = document.createElement("p");
+            rate.textContent = "Hourly Rate: ₹" + parking.hourly_rate;
+
+            const bookButton = document.createElement("button");
+
+            bookButton.textContent = "Book Parking";
+            bookButton.style.display = "block";
+
+            bookButton.disabled =
+                Number(parking.available_slots) === 0;
+
+            const formArea = document.createElement("div");
+
+            bookButton.onclick = () => {
+                createBookingForm(parking, formArea, bookButton);
+            };
+
+            card.append(
+                heading,
+                area,
+                address,
+                total,
+                available,
+                rate,
+                bookButton,
+                formArea
+            );
+
+            results.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        results.innerHTML = `
+            <div class="message">
+                <h3>Something went wrong!</h3>
+                <p>${error.message}</p>
+                <p>Please check whether Spring Boot is running.</p>
+            </div>
+        `;
+
+    }
+}
+
+
+// CREATE BOOKING FORM
+
+async function createBookingForm(parking, formArea, bookButton) {
+
+    formArea.innerHTML =
+        '<div class="message">Loading available slots...</div>';
+
+    try {
+
+        const response = await fetch(
+            "/api/bookings/slots?locationId=" + parking.location_id
+        );
+
+        if (!response.ok) {
+            throw new Error("Could not load slots");
+        }
+
+        const slots = await response.json();
+
+        if (slots.length === 0) {
+
+            formArea.innerHTML =
+                '<p class="unavailable">No available slots at this location.</p>';
+
+            return;
+        }
+
+        formArea.innerHTML = `
+
+            <div class="booking-form">
+
+                <h3>📝 Book Your Parking</h3>
+
+                <form id="bookingForm">
+
+                    <label>Customer Name</label>
+
+                    <input id="customerName"
+                        type="text"
+                        maxlength="100"
+                        required
+                        placeholder="Enter your name">
+
+                    <label>Vehicle Number</label>
+
+                    <input id="vehicleNumber"
+                        type="text"
+                        maxlength="30"
+                        required
+                        placeholder="Enter vehicle number">
+
+                    <label>Select Parking Slot</label>
+
+                    <select id="slotNumber" required></select>
+
+                    <label>Parking Duration</label>
+
+                    <select id="durationHours">
+
+                        <option value="1">1 Hour</option>
+                        <option value="2">2 Hours</option>
+                        <option value="3">3 Hours</option>
+                        <option value="4">4 Hours</option>
+                        <option value="5">5 Hours</option>
+                        <option value="6">6 Hours</option>
+                        <option value="12">12 Hours</option>
+                        <option value="24">24 Hours</option>
+
+                    </select>
+
+                    <p class="fee" id="fee">
+                        Total Fee: ₹${Number(parking.hourly_rate).toFixed(2)}
+                    </p>
+
+                    <button type="submit" id="submitBooking">
+                        Confirm Booking
+                    </button>
+
+                </form>
+
+                <div id="bookingMessage"></div>
+
+            </div>
+
+        `;
+
+        const slotSelect = document.getElementById("slotNumber");
+
+        slots.forEach(slot => {
+
+            const option = document.createElement("option");
+
+            option.value = slot.slot_number;
+            option.textContent = slot.slot_number;
+
+            slotSelect.appendChild(option);
+
+        });
+
+        const durationSelect =
+            document.getElementById("durationHours");
+
+        function updateFee() {
+
+            const fee =
+                Number(parking.hourly_rate) *
+                Number(durationSelect.value);
+
+            document.getElementById("fee").textContent =
+                "Total Fee: ₹" + fee.toFixed(2);
+
+        }
+
+        durationSelect.addEventListener("change", updateFee);
+
+        document.getElementById("bookingForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+                const submitButton =
+                    document.getElementById("submitBooking");
+
+                const message =
+                    document.getElementById("bookingMessage");
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Booking...";
+
+                const bookingData = {
+
+                    customerName:
+                        document.getElementById("customerName").value.trim(),
+
+                    vehicleNumber:
+                        document.getElementById("vehicleNumber").value.trim(),
+
+                    locationId: parking.location_id,
+
+                    slotNumber: slotSelect.value,
+
+                    durationHours: Number(durationSelect.value)
+
+                };
+
+                try {
+
+                    const bookingResponse = await fetch(
+                        "/api/bookings",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify(bookingData)
+                        }
+                    );
+
+                    const result = await bookingResponse.json();
+
+                    if (!bookingResponse.ok) {
+                        throw new Error(
+                            result.message || "Booking failed"
+                        );
+                    }
+
+                    message.className = "confirmation";
+
+                    message.textContent =
+                        "Booking Confirmed! Booking details: " +
+                        result.slotNumber + " | " +
+                        result.durationHours +
+                        " hours | ₹" +
+                        Number(result.totalAmount).toFixed(2);
+
+                    bookButton.disabled = true;
+                    bookButton.textContent = "Booking Confirmed";
+
+                    submitButton.remove();
+
+                    const refreshButton =
+                        document.createElement("button");
+
+                    refreshButton.textContent =
+                        "Refresh Parking Availability";
+
+                    refreshButton.onclick = () => {
+                        searchParking();
+                    };
+
+                    formArea.appendChild(refreshButton);
+
+                    // REFRESH HISTORY AFTER SUCCESSFUL BOOKING
+                    loadBookingHistory();
+
+                } catch (error) {
+
+                    message.className = "unavailable";
+                    message.textContent = error.message;
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Confirm Booking";
+
+                }
+
+            });
+
+    } catch (error) {
+
+        formArea.innerHTML =
+            '<p class="unavailable">' + error.message + '</p>';
+
+    }
+
+}
+
+
+// LOAD BOOKING HISTORY
+
+
+async function loadBookingHistory() {
+
+    const historyResults =
+        document.getElementById("historyResults");
+
+    try {
+
+        const response =
+            await fetch("/api/bookings/history");
+
+        if (!response.ok) {
+            throw new Error("Unable to load booking history");
+        }
+
+        const bookings = await response.json();
+
+        historyResults.innerHTML = "";
+
+        if (bookings.length === 0) {
+
+            historyResults.textContent = "No bookings found.";
+            return;
+        }
+
+        bookings.forEach(booking => {
+
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const heading = document.createElement("h3");
+
+            heading.textContent =
+                "🎫 Booking #" + booking.booking_id;
+
+            card.appendChild(heading);
+
+            const details = [
+
+                "Customer: " + booking.customer_name,
+                "Vehicle: " + booking.vehicle_number,
+                "Parking Slot: " + booking.slot_number,
+
+                "Booking Date: " +
+                    new Date(booking.booking_date).toLocaleString(),
+
+                "Duration: " + booking.duration_hours + " hours",
+                "Amount: ₹" + booking.total_amount,
+                "Status: " + booking.status
+
+            ];
+
+            details.forEach(detail => {
+
+                const p = document.createElement("p");
+                p.textContent = detail;
+                card.appendChild(p);
+
+            });
+
+            if (booking.status === "BOOKED") {
+
+                const cancelButton =
+                    document.createElement("button");
+
+                cancelButton.textContent = "Cancel Booking";
+
+                cancelButton.style.backgroundColor = "#dc3545";
+                cancelButton.style.color = "white";
+                cancelButton.style.padding = "10px 16px";
+                cancelButton.style.border = "none";
+                cancelButton.style.borderRadius = "6px";
+                cancelButton.style.cursor = "pointer";
+
+                cancelButton.addEventListener("click", async () => {
+
+                    const confirmCancel = confirm(
+                        "Are you sure you want to cancel Booking #" +
+                        booking.booking_id + "?"
+                    );
+
+                    if (!confirmCancel) return;
+
+                    cancelButton.disabled = true;
+                    cancelButton.textContent = "Cancelling...";
+
+                    try {
+
+                        const cancelResponse = await fetch(
+                            "/api/bookings/" +
+                            booking.booking_id + "/cancel",
+                            {
+                                method: "POST"
+                            }
+                        );
+
+                        const result = await cancelResponse.json();
+
+                        if (!cancelResponse.ok) {
+                            throw new Error(
+                                result.message || "Cancellation failed"
+                            );
+                        }
+
+                        alert("Booking cancelled successfully!");
+
+                        await loadBookingHistory();
+
+                    } catch (error) {
+
+                        alert(error.message);
+                        cancelButton.disabled = false;
+                        cancelButton.textContent = "Cancel Booking";
+
+                    }
+
+                });
+
+                card.appendChild(cancelButton);
+            }
+
+            historyResults.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        historyResults.textContent = error.message;
+
+    }
+
+}
+
+
+// LOAD HISTORY WHEN WEBSITE OPENS
+
+loadBookingHistory();
+
+
+</script>
+
+</body>
+</html>
